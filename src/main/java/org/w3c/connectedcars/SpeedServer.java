@@ -27,7 +27,7 @@ public class SpeedServer implements ContinuousTask {
 		}
 		mph += delta;
         if (session.isOpen()) {
-            async.sendText("{'mph':" + mph + "}", sendHandler);
+            async.sendText("{\"mph\":" + mph + "}", sendHandler);
         }
 	}
 
