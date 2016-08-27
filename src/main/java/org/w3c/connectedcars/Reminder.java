@@ -1,11 +1,11 @@
-package websocket.echo;
+package org.w3c.connectedcars;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
  * Simple demo that uses java.util.Timer to schedule a task 
- * to execute once 5 seconds have passed.
+ * to execute once x seconds have passed.
  */
 
 public class Reminder {
@@ -30,8 +30,4 @@ public class Reminder {
         }
     }
 
-    public static void main(String args[]) {
-        new Reminder(5, null);
-        System.out.println("Task scheduled.");
-    }
 }

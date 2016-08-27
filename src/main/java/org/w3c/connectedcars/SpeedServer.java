@@ -1,4 +1,4 @@
-package websocket.echo;
+package org.w3c.connectedcars;
 
 import java.io.IOException;
 

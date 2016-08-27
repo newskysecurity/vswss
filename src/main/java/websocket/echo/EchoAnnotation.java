@@ -26,6 +26,9 @@ import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.w3c.connectedcars.Reminder;
+import org.w3c.connectedcars.SpeedServer;
+
 @ServerEndpoint("/websocket/echoAnnotation")
 public class EchoAnnotation {
 	public static final String auth = "AuthMagic";
