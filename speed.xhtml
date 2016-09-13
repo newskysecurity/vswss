@@ -17,6 +17,7 @@
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Auto signal example using WSS</title>
     <style type="text/css"><![CDATA[
         #connect-container {
@@ -49,9 +50,38 @@
             margin: 0;
         }
     ]]></style>
-    <script type="application/javascript"><![CDATA[
-        var ws = null;
+<script type="text/javascript" src="speed_files/loader.js"></script>
 
+    <script type="application/javascript"><![CDATA[
+      google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+      var data = null;
+      var chart = null;
+      var options = null;
+      function drawChart() {
+
+        data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['mph', 100]
+        ]);
+        options = {
+          width: 400, height: 240,
+          redFrom: 90, redTo: 100,
+          yellowFrom:75, yellowTo: 90,
+          minorTicks: 5
+        };
+
+        chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+
+/*        setInterval(function() {
+          data.setValue(0, 1, 40 + Math.round(60 * Math.random()));
+          chart.draw(data, options);
+        }, 3000);*/
+      }
+
+        var ws = null;
         function setConnected(connected) {
             document.getElementById('connect').disabled = connected;
             document.getElementById('disconnect').disabled = !connected;
@@ -78,6 +108,11 @@
             };
             ws.onmessage = function (event) {
                 log('Received: ' + event.data);
+		var speed = JSON.parse(event.data + "");
+		var mph = speed.mph;
+		data.setValue(0, 1, mph);
+ 	        chart.draw(data, options);
+ 
             };
             ws.onclose = function (event) {
                 setConnected(false);
@@ -131,11 +166,11 @@
                 noscripts[i].parentNode.removeChild(noscripts[i]);
             }
         }, false);
-    ]]></script>
-</head>
+    ]]></script><link id="load-css-0" rel="stylesheet" type="text/css" href="speed_files/util.css" />
+<link id="load-css-1" rel="stylesheet" type="text/css" href="speed_files/tooltip.css" /></head>
 <body>
-<div class="noscript"><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
-    Javascript and reload this page!</h2></div>
+<div id="chart_div" style="width: 400px; height: 240px;"><table align="center" style="border: 0px none; padding: 0px; margin: 0px;" cellPadding="0" cellSpacing="0"><tbody><tr style="border: 0px none; padding: 0px; margin: 0px;"><td style="border: 0px none; padding: 0px; margin: 0px; width: 240px;"><div style="position: relative;"><div style="position: relative; width: 240px; height: 240px;" dir="ltr"><div style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%;"><svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" style="overflow: hidden;" aria-label="A chart."><defs id="defs"/><g><circle cx="119.5" cy="119.5" r="108" stroke="#333333" stroke-width="1" fill="#cccccc"/><circle cx="119.5" cy="119.5" r="96" stroke="#e0e0e0" stroke-width="2" fill="#f7f7f7"/><path d="M204.9969169910384,84.79312422241176A92,92,0,0,1,207.49719949915414,148.42956348249515L185.6228996243656,141.32217261187137A69,69,0,0,0,183.7476877432788,93.5948431668088Z" stroke="none" stroke-width="0" fill="#ff9900"/><path d="M207.49719949915414,148.42956348249515A92,92,0,0,1,185.0538238691624,185.0538238691624L168.79036790187183,168.79036790187172A69,69,0,0,0,185.62289962436557,141.32217261187137Z" stroke="none" stroke-width="0" fill="#dc3912"/><text text-anchor="middle" x="120" y="96.4" font-family="arial" font-size="24" stroke="none" stroke-width="0" fill="#333333">mph</text><text text-anchor="start" x="72.55313498238266" y="171.99686501761735" font-family="arial" font-size="13" stroke="none" stroke-width="0" fill="#333333">0</text><text text-anchor="end" x="167.4468650176174" y="171.9968650176173" font-family="arial" font-size="13" stroke="none" stroke-width="0" fill="#333333">100</text><path d="M49.401394391481176,163.26288115848058L41.55710487942352,168.0698679538673M41.252520450761295,145.58660713424564L32.50280050084588,148.42956348249515M37.45524476689701,126.49641312626557L28.283605296552224,127.21823680696174M38.2194053987226,107.04722629466889L29.132672665247327,105.60802921629877M53.01339286575434,71.33138111018323L45.57043651750483,65.92375678909248M66.22570159826076,57.03838604831747L60.25077955362306,50.04265116479718M82.40958662156552,46.224659797203145L78.23287402396168,38.02739977467016M100.67072387273106,39.487770591072376L98.52302652525672,30.541967323413743M139.3292761272689,39.48777059107236L141.47697347474323,30.54196732341373M157.59041337843445,46.224659797203145L161.7671259760383,38.02739977467016M173.77429840173923,57.03838604831745L179.7492204463769,50.042651164797164M186.98660713424562,71.3313811101832L194.42956348249515,65.92375678909245M201.78059460127741,107.04722629466886L210.86732733475264,105.60802921629875M202.544755233103,126.49641312626551L211.71639470344778,127.21823680696167M198.74747954923873,145.58660713424564L207.49719949915414,148.42956348249515M190.59860560851888,163.26288115848052L198.4428951205765,168.06986795386723" stroke="#666666" stroke-width="1" fill-opacity="1" fill="none"/><path d="M67.95694090467009,172.0430590953299L54.94617613083763,185.0538238691624M52.002466407169265,91.83449937792943L35.003083008961596,84.79312422241179M119.99999999999999,46.39999999999999L119.99999999999999,28M187.99753359283073,91.8344993779294L204.9969169910384,84.79312422241176M172.04305909532997,172.04305909532985L185.05382386916244,185.0538238691623" stroke="#333333" stroke-width="2" fill-opacity="1" fill="none"/><g><text text-anchor="middle" x="120" y="197.4" font-family="arial" font-size="24" stroke="none" stroke-width="0" fill="#000000">30</text><path d="M49.61552148937956,68.86268305055485C123.78533702476352,114.78993055622534,144.54514435488028,133.8529523423019,142.65247584249852,136.45798706418924C140.75980733011676,139.06302178607658,116.21466297523648,125.21006944377466,49.61552148937956,68.86268305055485" stroke="#c63310" stroke-width="1" fill-opacity="0.7" fill="#dc3912"/><circle cx="119.5" cy="119.5" r="14" stroke="#666666" stroke-width="1" fill="#4684ee"/></g></g></svg></div></div><div style="display: none; position: absolute; top: 250px; left: 250px; white-space: nowrap; font-family: Arial; font-size: 8px;" aria-hidden="true">-._.-*^*-._.-*^*-._.-</div></div></td></tr></tbody></table></div>
+
 <div>
     <div id="connect-container">
         <div>
@@ -148,22 +183,22 @@
                    onclick="updateTarget(this.value);"/> <label for="radio2">annotation API</label>-->
         </div>
         <div>
-            <input id="target" type="text" size="40" style="width: 350px" value="wss://auto.newskysecurity.com/echoAnnotation"/>
+            <input type="text" id="target" size="40" style="width: 350px" value="wss://auto.newskysecurity.com/echoAnnotation" />
         </div>
         <div>
-            <button id="connect" onclick="connect();">Connect</button>
-            <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+            <button id="connect" onclick="connect();" disabled="disabled">Connect</button>
+            <button id="disconnect" onclick="disconnect();">Disconnect</button>
         </div>
         <div>
             <textarea id="message" style="width: 350px">{'auth':'AuthMagic', 'subscribe':'root.engine.speed'}</textarea>
         </div>
         <div>
-            <button id="echo" onclick="echo();" disabled="disabled">Send message</button>
+            <button id="echo" onclick="echo();">Send message</button>
         </div>
     </div>
     <div id="console-container">
-        <div id="console"/>
+        <div id="console"><p style="word-wrap: break-word;">Received: {"mph":50}</p><p style="word-wrap: break-word;">Received: {"mph":40}</p><p style="word-wrap: break-word;">Received: {"mph":30}</p><p style="word-wrap: break-word;">Received: {"mph":20}</p><p style="word-wrap: break-word;">Received: {"mph":10}</p><p style="word-wrap: break-word;">Received: {"mph":0}</p><p style="word-wrap: break-word;">Received: {"mph":10}</p><p style="word-wrap: break-word;">Received: {"mph":20}</p><p style="word-wrap: break-word;">Received: {"mph":30}</p><p style="word-wrap: break-word;">Received: {"mph":40}</p><p style="word-wrap: break-word;">Received: {"mph":50}</p><p style="word-wrap: break-word;">Received: {"mph":60}</p><p style="word-wrap: break-word;">Received: {"mph":70}</p><p style="word-wrap: break-word;">Received: {"mph":80}</p><p style="word-wrap: break-word;">Received: {"mph":70}</p><p style="word-wrap: break-word;">Received: {"mph":60}</p><p style="word-wrap: break-word;">Received: {"mph":50}</p><p style="word-wrap: break-word;">Received: {"mph":40}</p><p style="word-wrap: break-word;">Received: {"mph":30}</p><p style="word-wrap: break-word;">Received: {"mph":20}</p><p style="word-wrap: break-word;">Received: {"mph":10}</p><p style="word-wrap: break-word;">Received: {"mph":0}</p><p style="word-wrap: break-word;">Received: {"mph":10}</p><p style="word-wrap: break-word;">Received: {"mph":20}</p><p style="word-wrap: break-word;">Received: {"mph":30}</p></div>
     </div>
-</div>
+</div><script type="text/javascript" src="speed_files/jsapi_compiled_format_module.js"></script><script type="text/javascript" src="speed_files/jsapi_compiled_default_module.js"></script><script type="text/javascript" src="speed_files/jsapi_compiled_ui_module.js"></script><script type="text/javascript" src="speed_files/jsapi_compiled_gauge_module.js"></script>
 </body>
 </html>
