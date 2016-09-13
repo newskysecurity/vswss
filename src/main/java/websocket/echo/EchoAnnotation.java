@@ -41,7 +41,8 @@ public class EchoAnnotation {
 			return notAuthed;
 		}
 		
-		if (message.contains("'subscribe':'root.engine.speed'")) {
+		if (message.contains("'subscribe':'root.engine.speed'")
+				|| message.contains("'action':'subscribe','path:'root.engine.speed'")) {
 			Reminder reminder = speedSubscribers.get(session);
 			if (reminder != null) {
 				// already subscribed, TODO: provide feedback
@@ -50,7 +51,8 @@ public class EchoAnnotation {
 				reminder = new Reminder(3, speed);
 				speedSubscribers.put(session, reminder);
 			}
-		} else if (message.contains("'unsubscribe':'root.engine.speed'")) {
+		} else if (message.contains("'unsubscribe':'root.engine.speed'")
+				|| message.contains("'action':'unsubscribe','path:'root.engine.speed'")) {
 			Reminder reminder = speedSubscribers.get(session);
 			if (reminder == null) {
 				// already unsubscribed or not subscribed, ignore
