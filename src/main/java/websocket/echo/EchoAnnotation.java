@@ -26,39 +26,56 @@ import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.w3c.connectedcars.Action;
+import org.w3c.connectedcars.ActionItem;
 import org.w3c.connectedcars.Reminder;
 import org.w3c.connectedcars.SpeedServer;
+import org.w3c.connectedcars.Request;
+import org.w3c.connectedcars.Response;
+import org.w3c.connectedcars.RequestResponseParser;
 
 @ServerEndpoint("/websocket/echoAnnotation")
 public class EchoAnnotation {
 	public static final String auth = "AuthMagic";
-	public static final String notAuthed = "{'status':403}";
-	public static final String success = "{'status':200}";
+	public static final Response notAuthedResp = new Response(403, null, null);
+	public static final Response successResp = new Response(200, null, null);
+	public static final String notAuthed = RequestResponseParser.toJson(notAuthedResp);
+	public static final String success = RequestResponseParser.toJson(successResp);
 	public static Map<Session, Reminder> speedSubscribers = new HashMap<Session, Reminder>();
 	private String processMessage(String message, Session session) {
 		String response = success;
-		if (!message.contains("'auth':'" + auth + "'")) {
+		Request request = null;
+		try {
+			request = RequestResponseParser.fromJson(message);
+			System.out.println(request);
+		} catch (Exception e) {
+			//TODO: log the exception
+		}
+		
+		if (null == request || !auth.equals(request.getAuth())) {
 			return notAuthed;
 		}
 		
-		if (message.contains("'subscribe':'root.engine.speed'")
-				|| message.contains("'action':'subscribe','path:'root.engine.speed'")) {
-			Reminder reminder = speedSubscribers.get(session);
-			if (reminder != null) {
-				// already subscribed, TODO: provide feedback
-			} else {
-				SpeedServer speed = new SpeedServer(session);
-				reminder = new Reminder(3, speed);
-				speedSubscribers.put(session, reminder);
-			}
-		} else if (message.contains("'unsubscribe':'root.engine.speed'")
-				|| message.contains("'action':'unsubscribe','path:'root.engine.speed'")) {
-			Reminder reminder = speedSubscribers.get(session);
-			if (reminder == null) {
-				// already unsubscribed or not subscribed, ignore
-			} else {
-				reminder.cancel();
-				speedSubscribers.remove(session);
+		ActionItem item = request.getItem();
+		
+		if (null != item.getSignal() && "root.engine.speed".equals(item.getSignal().getPath())) {
+			if (Action.SUBSCRIBE.equals(item.getAction())) {
+				Reminder reminder = speedSubscribers.get(session);
+				if (reminder != null) {
+					// already subscribed, TODO: provide feedback
+				} else {
+					SpeedServer speed = new SpeedServer(session);
+					reminder = new Reminder(3, speed);
+					speedSubscribers.put(session, reminder);
+				}
+			} else if (Action.UNSUBSCRIBE.equals(item.getAction())) {
+				Reminder reminder = speedSubscribers.get(session);
+				if (reminder == null) {
+					// already unsubscribed or not subscribed, ignore
+				} else {
+					reminder.cancel();
+					speedSubscribers.remove(session);
+				}
 			}
 		}
 		

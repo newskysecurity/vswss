@@ -8,17 +8,20 @@ import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
 public class SpeedServer implements ContinuousTask {
+	public static final String path = "root.engine.speed";
+	public static final String unit = "mph";
 	Session session;
 	Async async;
 	
 	int mph = 0;
 	int delta = 10;
+	Signal signal = new Signal(path, "", unit);
+	Response response = new Response(null, null, signal);
 	
 	public SpeedServer(Session session) {
 		this.session = session;
 		this.async = session.getAsyncRemote();
 	}
-	@Override
 	public void remind() {
 		if (mph == 80) {
 			delta = -10;
@@ -27,7 +30,8 @@ public class SpeedServer implements ContinuousTask {
 		}
 		mph += delta;
         if (session.isOpen()) {
-            async.sendText("{\"mph\":" + mph + "}", sendHandler);
+        	signal.setValue(mph + "");
+            async.sendText(RequestResponseParser.toJson(response), sendHandler);
         }
 	}
 
