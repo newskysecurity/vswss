@@ -46,7 +46,7 @@ public class EchoAnnotation {
 		String response = success;
 		Request request = null;
 		try {
-			request = RequestResponseParser.fromJson(message);
+			request = RequestResponseParser.fromJsonToRequest(message);
 			System.out.println(request);
 		} catch (Exception e) {
 			//TODO: log the exception
